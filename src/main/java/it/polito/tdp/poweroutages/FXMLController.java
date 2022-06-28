@@ -5,9 +5,11 @@
 package it.polito.tdp.poweroutages;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import it.polito.tdp.poweroutages.model.Model;
 import it.polito.tdp.poweroutages.model.Nerc;
+import it.polito.tdp.poweroutages.model.Poweroutages;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.ComboBox;
@@ -39,6 +41,20 @@ public class FXMLController {
     @FXML
     void doRun(ActionEvent event) {
     	txtResult.clear();
+    	Nerc nerc=cmbNerc.getValue();
+    	
+    	int y=Integer.parseInt(txtYears.getText());
+    	int h=Integer.parseInt(txtHours.getText());
+    	
+    	/*for(Poweroutages p: model.getPr(nerc)) {
+    		txtResult.appendText(p.toString()+"\n");
+    	}*/
+    	List<Poweroutages> worst=model.trovaSequenza(nerc, y, h);
+    	txtResult.appendText("Tot people affected: "+model.calcolaPersone(worst)+"\n");
+    	txtResult.appendText("Tot hours of outage: "+model.calcolaOre(worst)+"\n");
+    	for(Poweroutages p: model.trovaSequenza(nerc,y,h)) {
+    		txtResult.appendText(p.toString()+"\n");
+    	}
     }
 
     @FXML // This method is called by the FXMLLoader when initialization is complete
@@ -50,9 +66,15 @@ public class FXMLController {
         
         // Utilizzare questo font per incolonnare correttamente i dati;
         txtResult.setStyle("-fx-font-family: monospace");
+        
+        
     }
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbNerc.getItems().clear();
+        for(Nerc n: model.getNercList()) {
+        	cmbNerc.getItems().add(n);
+        }
     }
 }
